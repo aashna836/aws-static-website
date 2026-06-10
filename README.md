@@ -11,7 +11,7 @@
 
 ## 🔴 Live Demo
 
-🌍 **[View the live site →](https://YOUR-CLOUDFRONT-URL.cloudfront.net)**
+🌍 **[View the live site →](https://du4l4ccgotjh.cloudfront.net)**
 
 > The site itself explains the architecture — no need to read the whole README if you just want to see how it works.
 
