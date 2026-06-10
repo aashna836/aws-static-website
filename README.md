@@ -18,7 +18,7 @@
 ---
 
 ## 📐 Architecture
-
+![Site Preview](docs/architecture.png)
 ```
 User Browser
      │
