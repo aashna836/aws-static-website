@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Static Website on AWS — Project Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d1117;
+      --bg2:      #161b22;
+      --bg3:      #21262d;
+      --border:   #30363d;
+      --text:     #e6edf3;
+      --muted:    #8b949e;
+      --orange:   #f78166;
+      --orange2:  #ff9f7a;
+      --blue:     #58a6ff;
+      --green:    #3fb950;
+      --purple:   #bc8cff;
+      --yellow:   #e3b341;
+      --mono:     'JetBrains Mono', monospace;
+      --sans:     'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── HEADER ── */
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 18px 0;
+      position: sticky;
+      top: 0;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--orange);
+      letter-spacing: 0.02em;
+    }
+    .logo span { color: var(--muted); }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      margin-left: 24px;
+      transition: color .2s;
+    }
+    nav a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 80px 24px 60px;
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--orange);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--orange);
+    }
+    h1 {
+      font-family: var(--sans);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      max-width: 700px;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--orange);
+    }
+    .hero-desc {
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 560px;
+      margin-bottom: 36px;
+    }
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badge {
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+    }
+    .badge-s3     { color: var(--yellow); border-color: rgba(227,179,65,.3); background: rgba(227,179,65,.07); }
+    .badge-cf     { color: var(--blue);   border-color: rgba(88,166,255,.3); background: rgba(88,166,255,.07); }
+    .badge-r53    { color: var(--purple); border-color: rgba(188,140,255,.3); background: rgba(188,140,255,.07); }
+    .badge-free   { color: var(--green);  border-color: rgba(63,185,80,.3);  background: rgba(63,185,80,.07); }
+
+    /* ── SECTION ── */
+    section {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      border-top: 1px solid var(--border);
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--orange);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+    }
+    .section-desc {
+      color: var(--muted);
+      margin-bottom: 40px;
+      max-width: 560px;
+    }
+
+    /* ── ARCHITECTURE DIAGRAM ── */
+    .arch-diagram {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px 24px;
+      overflow-x: auto;
+    }
+    .arch-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      flex-wrap: wrap;
+      row-gap: 16px;
+    }
+    .arch-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+    }
+    .arch-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 600;
+    }
+    .arch-icon-user   { background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.25); }
+    .arch-icon-cf     { background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.25); color: var(--blue); }
+    .arch-icon-s3     { background: rgba(227,179,65,.12); border: 1px solid rgba(227,179,65,.25); color: var(--yellow); }
+    .arch-icon-r53    { background: rgba(188,140,255,.12); border: 1px solid rgba(188,140,255,.25); color: var(--purple); }
+    .arch-node-name {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 600;
+    }
+    .arch-node-sub {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .arch-arrow {
+      color: var(--muted);
+      font-size: 20px;
+      margin: 0 4px;
+      padding-bottom: 28px;
+      flex-shrink: 0;
+    }
+    .arch-arrow-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding-bottom: 28px;
+      margin: 0 4px;
+    }
+    .arch-arrow-label span:first-child { color: var(--muted); font-size: 18px; }
+    .arch-arrow-label span:last-child  { font-family: var(--mono); font-size: 10px; color: var(--green); }
+
+    /* ── HOW IT WORKS (steps) ── */
+    .steps { display: flex; flex-direction: column; gap: 16px; }
+    .step {
+      display: flex;
+      gap: 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      align-items: flex-start;
+      transition: border-color .2s;
+    }
+    .step:hover { border-color: var(--orange); }
+    .step-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--orange);
+      min-width: 28px;
+      padding-top: 2px;
+    }
+    .step-title { font-weight: 600; font-size: 15px; margin-bottom: 4px; }
+    .step-desc  { color: var(--muted); font-size: 14px; }
+    .step-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--blue);
+      margin-top: 6px;
+    }
+
+    /* ── SERVICES ── */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .service-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      transition: border-color .2s;
+    }
+    .service-card:hover { border-color: var(--orange); }
+    .service-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .service-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .service-name { font-weight: 600; font-size: 15px; }
+    .service-desc { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .service-free {
+      margin-top: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--green);
+    }
+
+    /* ── COST TABLE ── */
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .cost-table th {
+      text-align: left;
+      padding: 10px 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    .cost-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(48,54,61,.5);
+      color: var(--text);
+    }
+    .cost-table tr:last-child td { border-bottom: none; font-weight: 600; }
+    .cost-free { color: var(--green); font-family: var(--mono); font-size: 13px; }
+    .cost-total { color: var(--orange); font-family: var(--mono); }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .code-dots { display: flex; gap: 6px; }
+    .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+    .d1 { background: #ff5f57; } .d2 { background: #ffbd2e; } .d3 { background: #28c840; }
+    pre {
+      padding: 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      overflow-x: auto;
+      color: var(--text);
+    }
+    .c-key  { color: var(--blue); }
+    .c-val  { color: var(--orange); }
+    .c-str  { color: var(--green); }
+    .c-com  { color: var(--muted); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    footer a { color: var(--blue); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 600px) {
+      .arch-arrow-label, .arch-arrow { display: none; }
+      .arch-flow { gap: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">aws-static-site <span>/ project showcase</span></div>
+    <nav>
+      <a href="#architecture">Architecture</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#services">Services</a>
+      <a href="#cost">Cost</a>
+      <a href="https://github.com" target="_blank">GitHub →</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">AWS Cloud Project</div>
+  <h1>Static website hosted on <em>AWS</em> — free tier</h1>
+  <p class="hero-desc">
+    A production-grade static website deployment using S3 for storage, CloudFront as a global CDN, and Route 53 for DNS — the same stack used at scale by real companies.
+  </p>
+  <div class="badges">
+    <span class="badge badge-s3">Amazon S3</span>
+    <span class="badge badge-cf">CloudFront</span>
+    <span class="badge badge-r53">Route 53</span>
+    <span class="badge badge-free">✓ Free tier</span>
+  </div>
+</div>
+
+<section id="architecture">
+  <div class="section-label">01 — Architecture</div>
+  <h2>How the pieces connect</h2>
+  <p class="section-desc">A request from a browser travels through three AWS services before the page appears on screen.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-flow">
+
+      <div class="arch-node">
+        <div class="arch-icon arch-icon-user">🌐</div>
+        <div class="arch-node-name">User</div>
+        <div class="arch-node-sub">Browser request</div>
+      </div>
+
+      <div class="arch-arrow-label">
+        <span>→</span>
+        <span>DNS lookup</span>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-icon arch-icon-r53">53</div>
+        <div class="arch-node-name">Route 53</div>
+        <div class="arch-node-sub">DNS routing</div>
+      </div>
+
+      <div class="arch-arrow-label">
+        <span>→</span>
+        <span>HTTPS</span>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-icon arch-icon-cf">CF</div>
+        <div class="arch-node-name">CloudFront</div>
+        <div class="arch-node-sub">Global CDN · SSL</div>
+      </div>
+
+      <div class="arch-arrow-label">
+        <span>→</span>
+        <span>Cache miss</span>
+      </div>
+
+      <div class="arch-node">
+        <div class="arch-icon arch-icon-s3">S3</div>
+        <div class="arch-node-name">S3 Bucket</div>
+        <div class="arch-node-sub">Static files origin</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="section-label">02 — How it works</div>
+  <h2>Request flow, step by step</h2>
+  <p class="section-desc">What actually happens between you typing the URL and seeing this page.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div>
+        <div class="step-title">Browser sends a DNS query</div>
+        <div class="step-desc">Your browser asks Route 53 to resolve the domain name. Route 53 returns the CloudFront distribution's address, not S3 directly — this is what keeps S3 private.</div>
+        <div class="step-tag">Route 53 → A record (Alias)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div>
+        <div class="step-title">CloudFront checks its cache</div>
+        <div class="step-desc">The request hits the nearest CloudFront edge location (there are 400+ worldwide). If the file is already cached there, it's returned immediately — no trip to S3 needed. This is why the site loads fast globally.</div>
+        <div class="step-tag">CloudFront edge → Cache hit or miss</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div>
+        <div class="step-title">On cache miss — fetch from S3</div>
+        <div class="step-desc">If the file isn't cached, CloudFront fetches it from the S3 origin bucket over a private AWS backbone link, caches it, and serves it. The S3 bucket itself stays private — only CloudFront can access it via an Origin Access Control (OAC) policy.</div>
+        <div class="step-tag">CloudFront → S3 origin (private OAC)</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div>
+        <div class="step-title">HTTPS enforced end-to-end</div>
+        <div class="step-desc">CloudFront terminates SSL using a free certificate from AWS Certificate Manager (ACM). HTTP requests are automatically redirected to HTTPS. S3 itself doesn't handle SSL — that's entirely CloudFront's job.</div>
+        <div class="step-tag">ACM certificate · HTTP → HTTPS redirect</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="section-label">03 — Services used</div>
+  <h2>AWS services in this project</h2>
+  <p class="section-desc">Three services, each doing exactly one job well.</p>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-header">
+        <div class="service-dot" style="background:var(--yellow)"></div>
+        <div class="service-name">Amazon S3</div>
+      </div>
+      <div class="service-desc">Object storage that holds all static files — HTML, CSS, JS, images. Acts as the origin for CloudFront. The bucket is kept private; no public access is enabled on S3 itself.</div>
+      <div class="service-free">Free: 5 GB storage · 20,000 GET requests/month</div>
+    </div>
+    <div class="service-card">
+      <div class="service-header">
+        <div class="service-dot" style="background:var(--blue)"></div>
+        <div class="service-name">Amazon CloudFront</div>
+      </div>
+      <div class="service-desc">Content delivery network with 400+ edge locations globally. Handles SSL termination, HTTP→HTTPS redirect, caching, and serving files close to the user for low latency.</div>
+      <div class="service-free">Free: 1 TB data transfer · 10M requests/month</div>
+    </div>
+    <div class="service-card">
+      <div class="service-header">
+        <div class="service-dot" style="background:var(--purple)"></div>
+        <div class="service-name">Route 53</div>
+      </div>
+      <div class="service-desc">AWS managed DNS. Routes your custom domain to the CloudFront distribution using an Alias record. Also supports health checks and failover routing for more advanced setups.</div>
+      <div class="service-free">$0.50/hosted zone/month (optional — skip to stay fully free)</div>
+    </div>
+    <div class="service-card">
+      <div class="service-header">
+        <div class="service-dot" style="background:var(--green)"></div>
+        <div class="service-name">AWS Certificate Manager</div>
+      </div>
+      <div class="service-desc">Provisions and auto-renews free SSL/TLS certificates for your domain. Must be created in us-east-1 region to work with CloudFront, regardless of where your other resources are.</div>
+      <div class="service-free">Free: public SSL certificates are always free</div>
+    </div>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="section-label">04 — Cost estimate</div>
+  <h2>What this actually costs</h2>
+  <p class="section-desc">For a personal project or portfolio with low traffic — essentially nothing.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <span>monthly-cost-estimate.txt</span>
+    </div>
+    <pre>
+<span class="c-com"># Assuming ~10,000 page views/month</span>
+
+<span class="c-key">S3 Storage</span>        <span class="c-str">~50 MB of HTML/CSS/JS</span>       <span class="c-val">$0.00</span>  <span class="c-com">(under 5 GB free tier)</span>
+<span class="c-key">S3 Requests</span>       <span class="c-str">CloudFront origin fetches</span>    <span class="c-val">$0.00</span>  <span class="c-com">(under 20K free tier)</span>
+<span class="c-key">CloudFront</span>        <span class="c-str">~1 GB data transfer</span>          <span class="c-val">$0.00</span>  <span class="c-com">(under 1 TB free tier)</span>
+<span class="c-key">ACM Certificate</span>   <span class="c-str">SSL cert for domain</span>          <span class="c-val">$0.00</span>  <span class="c-com">(always free)</span>
+<span class="c-key">Route 53</span>          <span class="c-str">1 hosted zone (optional)</span>     <span class="c-val">$0.50</span>  <span class="c-com">(skip to stay free)</span>
+
+──────────────────────────────────────────────────────────
+<span class="c-key">Total</span>                                                <span class="c-val">$0.00 – $0.50 / month</span>
+    </pre>
+  </div>
+</section>
+
+<section>
+  <div class="section-label">05 — Bucket Policy</div>
+  <h2>S3 bucket policy used</h2>
+  <p class="section-desc">This policy allows only CloudFront (via OAC) to read from the bucket. The bucket itself stays private.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <span>bucket-policy.json</span>
+    </div>
+    <pre>{
+  <span class="c-key">"Version"</span>: <span class="c-str">"2012-10-17"</span>,
+  <span class="c-key">"Statement"</span>: [
+    {
+      <span class="c-key">"Sid"</span>: <span class="c-str">"AllowCloudFrontOAC"</span>,
+      <span class="c-key">"Effect"</span>: <span class="c-str">"Allow"</span>,
+      <span class="c-key">"Principal"</span>: {
+        <span class="c-key">"Service"</span>: <span class="c-str">"cloudfront.amazonaws.com"</span>
+      },
+      <span class="c-key">"Action"</span>: <span class="c-str">"s3:GetObject"</span>,
+      <span class="c-key">"Resource"</span>: <span class="c-str">"arn:aws:s3:::YOUR-BUCKET-NAME/*"</span>,
+      <span class="c-key">"Condition"</span>: {
+        <span class="c-key">"StringEquals"</span>: {
+          <span class="c-str">"AWS:SourceArn"</span>: <span class="c-str">"arn:aws:cloudfront::ACCOUNT-ID:distribution/DIST-ID"</span>
+        }
+      }
+    }
+  ]
+}</pre>
+  </div>
+</section>
+
+<footer>
+  Built with Amazon S3 · CloudFront · Route 53 &nbsp;·&nbsp;
+  <a href="https://github.com" target="_blank">View on GitHub</a> &nbsp;·&nbsp;
+  AWS Free Tier project
+</footer>
+
+</body>
+</html>

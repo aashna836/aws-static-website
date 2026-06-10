@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 — Page not found</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --bg2: #161b22; --border: #30363d;
+      --text: #e6edf3; --muted: #8b949e; --orange: #f78166;
+      --blue: #58a6ff; --mono: 'JetBrains Mono', monospace; --sans: 'Inter', sans-serif;
+    }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: var(--sans); min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+    }
+    .container { max-width: 480px; }
+    .code {
+      font-family: var(--mono); font-size: 80px; font-weight: 600;
+      color: var(--orange); line-height: 1; margin-bottom: 24px;
+      letter-spacing: -0.04em;
+    }
+    h1 { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+    p { color: var(--muted); font-size: 15px; margin-bottom: 32px; line-height: 1.6; }
+    a {
+      display: inline-block; padding: 10px 24px;
+      background: rgba(247,129,102,.1); border: 1px solid rgba(247,129,102,.3);
+      color: var(--orange); text-decoration: none; border-radius: 8px;
+      font-size: 14px; transition: background .2s;
+    }
+    a:hover { background: rgba(247,129,102,.18); }
+    .label {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="label">CloudFront · S3 · Error response</div>
+    <div class="code">404</div>
+    <h1>Page not found</h1>
+    <p>This path doesn't exist in the S3 bucket. CloudFront forwarded the request, S3 returned a 404, and this custom error page was served instead of the default AWS error.</p>
+    <a href="/">← Back to home</a>
+  </div>
+</body>
+</html>
